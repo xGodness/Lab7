@@ -6,6 +6,7 @@ import common.collectionexceptions.CollectionException;
 
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public interface CollectionManagerImpl {
     void addMovie(Movie movie, String username) throws SQLException;
@@ -20,6 +21,6 @@ public interface CollectionManagerImpl {
     LinkedList<Movie> startsWithTagline(String taglineValue);
     int getCollectionSize();
     boolean isEmpty();
-    LinkedList<Movie> getCollection();
+    ConcurrentSkipListSet<Movie> getCollection();
     String getInitDateTime();
 }

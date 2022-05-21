@@ -9,6 +9,7 @@ import common.databaseexceptions.DatabaseException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 /**
@@ -16,7 +17,8 @@ import java.util.stream.Collectors;
  * Provides interaction tools for the collection
  */
 public class CollectionManager implements CollectionManagerImpl {
-    private LinkedList<Movie> collection = new LinkedList<>();
+//    private LinkedList<Movie> collection = new LinkedList<>();
+    private ConcurrentSkipListSet<Movie> collection = new ConcurrentSkipListSet<>();
 
     private IOManager ioManager;
     private DBManager dbManager;
@@ -32,7 +34,7 @@ public class CollectionManager implements CollectionManagerImpl {
         initDateTime = dateFormatter.format(new Date());
     }
 
-    public CollectionManager(LinkedList<Movie> collection) {
+    public CollectionManager(ConcurrentSkipListSet<Movie> collection) {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         initDateTime = dateFormatter.format(new Date());
         this.collection = collection;
@@ -58,33 +60,46 @@ public class CollectionManager implements CollectionManagerImpl {
 
     public void addMovie(Movie movie, String username) throws SQLException {
         dbManager.add(movie, username);
-        collection = dbManager.getCollection();
+        collection.add(movie);
     }
     public Movie removeHead(String username) throws SQLException, DatabaseException {
         Movie movie = dbManager.removeHead(username);
-        collection = dbManager.getCollection();
+        collection.remove(movie);
         return movie;
     }
 
     public void clearCollection(String username) throws SQLException {
         dbManager.clear(username);
-        collection = dbManager.getCollection();
+        Set<Movie> moviesToRemove = collection.stream()
+                .filter(m -> m.getOwnerUsername().equals(username))
+                .collect(Collectors.toSet());
+        collection.removeAll(moviesToRemove);
     }
 
     public void updateMovie(Long id, Movie movie, String username) throws SQLException, DatabaseException {
+        Movie target = collection.stream()
+                .filter(m -> m.getId() == id)
+                .findFirst()
+                .get();
         dbManager.update(movie, id, username);
-        collection = dbManager.getCollection();
+        collection.remove(target);
+        collection.add(movie);
     }
 
     public void removeMovie(Long id, String username) throws SQLException, DatabaseException {
         dbManager.remove(id, username);
-        collection = dbManager.getCollection();
+        collection.remove(
+                collection.stream()
+                        .filter(m -> m.getId() == id)
+                        .findFirst()
+                        .get()
+        );
     }
 
     public boolean addIfMax(Movie movie, String username) throws SQLException, DatabaseException {
         if (movie.compareTo(maxByScreenwriter()) > 0) {
             dbManager.add(movie, username);
-            collection = dbManager.getCollection();
+            collection.add(movie);
             return true;
         }
         return false;
@@ -95,7 +110,10 @@ public class CollectionManager implements CollectionManagerImpl {
         if (removedCount == 0) {
             throw new DatabaseException("There are no movies lower than given and owned by " + username);
         }
-        collection = dbManager.getCollection();
+        Set<Movie> moviesToRemove = collection.stream()
+                .filter(m -> m.getOwnerUsername().equals(username))
+                .collect(Collectors.toSet());
+        collection.removeAll(moviesToRemove);
         return removedCount;
     }
 
@@ -131,7 +149,7 @@ public class CollectionManager implements CollectionManagerImpl {
     /*________________________________________________________________________________________________________________
                                                     Getters
     ________________________________________________________________________________________________________________*/
-    public LinkedList<Movie> getCollection() {
+    public ConcurrentSkipListSet<Movie> getCollection() {
         return collection;
     }
 
@@ -155,7 +173,7 @@ public class CollectionManager implements CollectionManagerImpl {
                                                     Setters
     ________________________________________________________________________________________________________________*/
 
-    public void setCollection(LinkedList<Movie> collection) {
+    public void setCollection(ConcurrentSkipListSet<Movie> collection) {
         this.collection = collection;
     }
 

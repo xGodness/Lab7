@@ -7,6 +7,7 @@ import common.collectionexceptions.CollectionException;
 import javax.validation.constraints.NotNull;
 
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 public class ShowCommand extends Command {
@@ -30,8 +31,8 @@ public class ShowCommand extends Command {
         if (moviesCollection.getCollectionSize() == 0) {
             throw new CollectionException("Collection is empty");
         }
-        LinkedList<Movie> collection = (moviesCollection.getCollection());
-        collection.sort(Movie::compareTo);
+        ConcurrentSkipListSet<Movie> collection = (moviesCollection.getCollection());
+//        collection.sort(Movie::compareTo);
         return collection.stream()
                 .map(m -> m.toString().trim())
                 .collect(Collectors.joining("\n"));

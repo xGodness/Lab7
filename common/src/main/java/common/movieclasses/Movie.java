@@ -50,7 +50,7 @@ public class Movie
 
     @Override
     public int compareTo(Movie m) {
-        return coordinates.compareTo(m.getCoordinates());
+        return (int) (id - m.getId());
     }
 
     @Override
@@ -142,5 +142,11 @@ public class Movie
         this.screenwriter = screenwriter;
     }
 
+    public String getOwnerUsername() {
+        return ownerUsername;
+    }
 
+    public void setOwnerUsername(String ownerUsername) {
+        this.ownerUsername = ownerUsername;
+    }
 }

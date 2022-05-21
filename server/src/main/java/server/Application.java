@@ -8,6 +8,7 @@ import common.IO.IOManager;
 
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * Class-connector. Operates all others classes presented in code.
@@ -43,7 +44,7 @@ public class Application {
      */
     public void loadCollection() throws SQLException {
         LinkedList<Movie> collection = dbManager.getCollection();
-        CollectionManager collectionManager = new CollectionManager(collection);
+        CollectionManager collectionManager = new CollectionManager(new ConcurrentSkipListSet(collection));
         collectionManager.setup(this);
         this.collectionManager = collectionManager;
         collectionWasLoaded = true;
