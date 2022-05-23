@@ -26,7 +26,7 @@ public class CommandsFactory {
             Class.forName(_class.getName());
             registeredCommands.put(tag, _class);
         } catch (ClassNotFoundException e) {
-            throw new CommandNotFoundException("Command '" + tag + "' doesn't exist");
+            throw new CommandNotFoundException("Command '" + tag + "' does not exist");
         }
     }
 
@@ -49,7 +49,7 @@ public class CommandsFactory {
             }
             return description;
         }
-        throw new CommandNotFoundException("Command '" + tag + "' doesn't exist");
+        throw new CommandNotFoundException("Command '" + tag + "' does not exist");
     }
 
     /**
@@ -72,7 +72,7 @@ public class CommandsFactory {
                 e.printStackTrace();
             }
         }
-        throw new CommandNotFoundException("Command '" + tag + "' doesn't exist");
+        throw new CommandNotFoundException("Command '" + tag + "' does not exist");
     }
 
     /**

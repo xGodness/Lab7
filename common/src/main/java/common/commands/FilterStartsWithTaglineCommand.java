@@ -25,10 +25,10 @@ public class FilterStartsWithTaglineCommand extends Command {
     }
 
     @Override
-    public String execute(@NotNull CollectionManagerImpl moviesCollection, Object[] args, String username) throws CollectionException {
+    public String execute(@NotNull CollectionManagerImpl collectionManager, Object[] args, String username) throws CollectionException {
         try {
             String tagline = (String) args[0];
-            LinkedList<Movie> result = moviesCollection.startsWithTagline(tagline);
+            LinkedList<Movie> result = collectionManager.startsWithTagline(tagline);
             if (result == null || result.size() == 0) {
                 throw new CollectionException("None of the collection elements starts with given tagline");
             }

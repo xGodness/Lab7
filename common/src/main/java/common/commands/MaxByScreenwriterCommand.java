@@ -23,9 +23,9 @@ public class MaxByScreenwriterCommand extends Command {
     }
 
     @Override
-    public String execute(@NotNull CollectionManagerImpl moviesCollection, Object[] args, String username) throws CollectionException {
+    public String execute(@NotNull CollectionManagerImpl collectionManager, Object[] args, String username) throws CollectionException {
         try {
-            Movie result = moviesCollection.maxByScreenwriter();
+            Movie result = collectionManager.maxByScreenwriter();
             return result.toString();
         } catch (DatabaseException e) {
             throw new CollectionException(e.getMessage());

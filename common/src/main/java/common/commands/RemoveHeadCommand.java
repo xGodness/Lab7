@@ -25,9 +25,9 @@ public class RemoveHeadCommand extends Command {
     }
 
     @Override
-    public String execute(@NotNull CollectionManagerImpl moviesCollection, Object[] args, String username) throws CollectionException {
+    public String execute(@NotNull CollectionManagerImpl collectionManager, Object[] args, String username) throws CollectionException {
         try {
-            return moviesCollection.removeHead(username).toString();
+            return collectionManager.removeHead(username).toString();
         } catch (DatabaseException e) {
             throw new CollectionException(e.getMessage());
         } catch (SQLException e) {

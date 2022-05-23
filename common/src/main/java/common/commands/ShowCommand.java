@@ -27,11 +27,11 @@ public class ShowCommand extends Command {
     }
 
     @Override
-    public String execute(@NotNull CollectionManagerImpl moviesCollection, Object[] args, String username) throws CollectionException {
-        if (moviesCollection.getCollectionSize() == 0) {
+    public String execute(@NotNull CollectionManagerImpl collectionManager, Object[] args, String username) throws CollectionException {
+        if (collectionManager.getCollectionSize() == 0) {
             throw new CollectionException("Collection is empty");
         }
-        ConcurrentSkipListSet<Movie> collection = (moviesCollection.getCollection());
+        ConcurrentSkipListSet<Movie> collection = (collectionManager.getCollection());
 //        collection.sort(Movie::compareTo);
         return collection.stream()
                 .map(m -> m.toString().trim())

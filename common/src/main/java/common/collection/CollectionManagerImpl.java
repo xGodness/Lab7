@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 public interface CollectionManagerImpl {
-    void addMovie(Movie movie, String username) throws SQLException;
+    void addMovie(Movie movie, String username) throws SQLException, CollectionException;
     Movie removeHead(String username) throws SQLException, DatabaseException;
     void clearCollection(String username) throws SQLException;
     void updateMovie(Long id, Movie movie, String username) throws SQLException, DatabaseException;

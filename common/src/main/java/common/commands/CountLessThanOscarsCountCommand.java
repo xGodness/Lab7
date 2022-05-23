@@ -22,10 +22,10 @@ public class CountLessThanOscarsCountCommand extends Command {
     }
 
     @Override
-    public String execute(@NotNull CollectionManagerImpl moviesCollection, Object[] args, String username) throws CollectionException {
+    public String execute(@NotNull CollectionManagerImpl collectionManager, Object[] args, String username) throws CollectionException {
         try {
             int value = Integer.parseInt((String) args[0]);
-            return Integer.valueOf(moviesCollection.countLessThanOscarsCount(value)).toString();
+            return Integer.valueOf(collectionManager.countLessThanOscarsCount(value)).toString();
         } catch (DatabaseException e) {
             throw new CollectionException(e.getMessage());
         } catch (NumberFormatException e) {

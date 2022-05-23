@@ -25,10 +25,10 @@ public class RemoveLowerCommand extends Command {
     }
 
     @Override
-    public String execute(@NotNull CollectionManagerImpl moviesCollection, Object[] args, String username) throws CollectionException {
+    public String execute(@NotNull CollectionManagerImpl collectionManager, Object[] args, String username) throws CollectionException {
         try {
             Movie movie = (Movie) args[0];
-            return "Successfully removed " + moviesCollection.removeLower(movie, username) + " movies";
+            return "Successfully removed " + collectionManager.removeLower(movie, username) + " movies";
         } catch (DatabaseException e) {
             throw new CollectionException(e.getMessage());
         } catch (SQLException e) {

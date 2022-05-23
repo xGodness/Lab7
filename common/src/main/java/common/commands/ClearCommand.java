@@ -24,9 +24,9 @@ public class ClearCommand extends Command {
     }
 
     @Override
-    public String execute(@NotNull CollectionManagerImpl moviesCollection, Object[] args, String username) throws CollectionException {
+    public String execute(@NotNull CollectionManagerImpl collectionManager, Object[] args, String username) throws CollectionException {
         try {
-            moviesCollection.clearCollection(username);
+            collectionManager.clearCollection(username);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new CollectionException("Error while connecting to the database");

@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 
 public class DBManager {
-    private Connection connection;
-    private StatementInvoker statementInvoker;
+    private final Connection connection;
+    private final StatementInvoker statementInvoker;
 
     public DBManager(String host, String username, String password) throws SQLException {
         if (host.equals("jdbc:postgresql://pg:5432/studs")) {
@@ -42,29 +42,13 @@ public class DBManager {
         statementInvoker.loginUser(username, password);
     }
 
-    public Movie add(Movie movie, String ownerUsername) throws SQLException {
+    public Movie add(Movie movie, String username) throws SQLException {
         ResultSet idResult = connection.createStatement().executeQuery(StatementPatterns.toSQLString(StatementPatterns.GET_NEXT_ID));
         idResult.next();
-        Long id = idResult.getLong("nextval");
+        long id = idResult.getLong("nextval");
         PreparedStatement statement = connection.prepareStatement(StatementPatterns.toSQLString(StatementPatterns.ADD_MOVIE));
-        statement.setString(1, movie.getName());
-        statement.setDouble(2, movie.getCoordinates().getX());
-        statement.setFloat(3, movie.getCoordinates().getY());
-        statement.setDate(4, Date.valueOf(movie.getCreationDate().toLocalDate()));
-        statement.setInt(5, movie.getOscarsCount());
-        statement.setString(6, movie.getTagline());
-        statement.setObject(7, movie.getGenre().getLabelAsEnumType(), Types.OTHER);
-        statement.setObject(8, movie.getMpaaRating().getLabelAsEnumType(), Types.OTHER);
-        statement.setString(9, movie.getScreenwriter().getName());
-        LocalDate birthday = movie.getScreenwriter().getBirthday();
-        statement.setObject(10, birthday == null ? null : Date.valueOf(movie.getScreenwriter().getBirthday()), Types.DATE);
-        statement.setObject(11, movie.getScreenwriter().getEyeColor().getLabelAsEnumType(), Types.OTHER);
-        statement.setObject(12, movie.getScreenwriter().getHairColor().getLabelAsEnumType(), Types.OTHER);
-        statement.setObject(13, movie.getScreenwriter().getNationality().getLabelAsEnumType(), Types.OTHER);
-        statement.setInt(14, movie.getScreenwriter().getLocation().getX());
-        statement.setDouble(15, movie.getScreenwriter().getLocation().getY());
-        statement.setString(16, movie.getScreenwriter().getLocation().getName());
-        statement.setString(17, ownerUsername);
+        setUpMovieToStatement(statement, movie);
+        statement.setString(17, username);
         statement.setLong(18, id);
         statement.executeUpdate();
         movie.setId(id);
@@ -73,28 +57,37 @@ public class DBManager {
 
     public void update(Movie movie, Long id, String username) throws SQLException, DatabaseException {
         PreparedStatement statement = connection.prepareStatement(StatementPatterns.toSQLString(StatementPatterns.UPDATE_MOVIE));
+        setUpMovieToStatement(statement, movie);
+        statement.setLong(17, id);
+        statement.setString(18, username);
+        if (statement.executeUpdate() == 0) {
+            throw new DatabaseException("Movie with id " + id + " does not exist or is owned by another user");
+        }
+    }
+
+    private void setUpMovieToStatement(PreparedStatement statement, Movie movie) throws SQLException {
         statement.setString(1, movie.getName());
         statement.setDouble(2, movie.getCoordinates().getX());
         statement.setFloat(3, movie.getCoordinates().getY());
         statement.setDate(4, Date.valueOf(movie.getCreationDate().toLocalDate()));
-        statement.setInt(5, movie.getOscarsCount());
+        Integer oscarsCount = movie.getOscarsCount();
+        if (oscarsCount != null) {
+            statement.setInt(5, movie.getOscarsCount());
+        } else {
+            statement.setNull(5, Types.NULL);
+        }
         statement.setString(6, movie.getTagline());
         statement.setObject(7, movie.getGenre().getLabelAsEnumType(), Types.OTHER);
         statement.setObject(8, movie.getMpaaRating().getLabelAsEnumType(), Types.OTHER);
         statement.setString(9, movie.getScreenwriter().getName());
         LocalDate birthday = movie.getScreenwriter().getBirthday();
-        statement.setObject(10, birthday == null ? null : Date.valueOf(movie.getScreenwriter().getBirthday()), Types.DATE);
+        statement.setObject(10, ( birthday == null ? null : Date.valueOf(movie.getScreenwriter().getBirthday()) ), Types.DATE);
         statement.setObject(11, movie.getScreenwriter().getEyeColor().getLabelAsEnumType(), Types.OTHER);
         statement.setObject(12, movie.getScreenwriter().getHairColor().getLabelAsEnumType(), Types.OTHER);
         statement.setObject(13, movie.getScreenwriter().getNationality().getLabelAsEnumType(), Types.OTHER);
         statement.setInt(14, movie.getScreenwriter().getLocation().getX());
         statement.setDouble(15, movie.getScreenwriter().getLocation().getY());
         statement.setString(16, movie.getScreenwriter().getLocation().getName());
-        statement.setLong(17, id);
-        statement.setString(18, username);
-        if (statement.executeUpdate() == 0) {
-            throw new DatabaseException("Movie with id " + id + " does not exist or is owned by another user");
-        }
     }
 
     public void remove(Long id, String username) throws DatabaseException, SQLException {
@@ -176,7 +169,7 @@ public class DBManager {
         String movieName = rows.getString("movie_name");
         Double coordinateX = rows.getDouble("coordinate_x");
         Float coordinateY = rows.getFloat("coordinate_y");
-        LocalDateTime creationDate = rows.getDate("creation_date").toLocalDate().atStartOfDay();
+        LocalDateTime creationDate = rows.getDate("creation_date").toLocalDate().atStartOfDay(); //TODO: time stamp
         Integer oscarsCount = rows.getInt("oscars_count");
         String tagline = rows.getString("tagline");
         MovieGenre movieGenre = MovieGenre.valueOfLabel(rows.getString("movie_genre"));

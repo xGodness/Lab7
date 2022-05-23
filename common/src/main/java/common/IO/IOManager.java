@@ -22,8 +22,8 @@ public class IOManager {
     private final Scanner defaultScanner = new Scanner(System.in).useDelimiter("\n");
     private final Random random = new Random();
     private Scanner scanner;
-    private StringValidator stringValidator;
-    private Stack<Scanner> scannerStack = new Stack<>();
+    private final StringValidator stringValidator;
+    private final Stack<Scanner> scannerStack = new Stack<>();
 
     public IOManager() {
         scanner = defaultScanner;

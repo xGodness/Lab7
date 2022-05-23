@@ -1,6 +1,7 @@
 package server;
 
 import common.collection.CollectionManagerImpl;
+import common.collectionexceptions.CollectionException;
 import common.movieclasses.Movie;
 import common.IO.IOManager;
 import server.database.DBManager;
@@ -58,7 +59,10 @@ public class CollectionManager implements CollectionManagerImpl {
                                                 Commands realisation
     ________________________________________________________________________________________________________________*/
 
-    public void addMovie(Movie movie, String username) throws SQLException {
+    public void addMovie(Movie movie, String username) throws SQLException, CollectionException {
+        if (collection.size() >= 100) {
+            throw new CollectionException("Unable to add movie: collection size limit has been reached (100 movies)");
+        }
         dbManager.add(movie, username);
         collection.add(movie);
     }
@@ -77,11 +81,11 @@ public class CollectionManager implements CollectionManagerImpl {
     }
 
     public void updateMovie(Long id, Movie movie, String username) throws SQLException, DatabaseException {
+        dbManager.update(movie, id, username);
         Movie target = collection.stream()
                 .filter(m -> m.getId() == id)
                 .findFirst()
                 .get();
-        dbManager.update(movie, id, username);
         collection.remove(target);
         collection.add(movie);
     }
@@ -108,7 +112,7 @@ public class CollectionManager implements CollectionManagerImpl {
     public int removeLower(Movie movie, String username) throws SQLException, DatabaseException {
         int removedCount = dbManager.removeLower(movie, username);
         if (removedCount == 0) {
-            throw new DatabaseException("There are no movies lower than given and owned by " + username);
+            throw new DatabaseException("There are no movies lower than given and owned by user \"" + username + "\"");
         }
         Set<Movie> moviesToRemove = collection.stream()
                 .filter(m -> m.getOwnerUsername().equals(username))
@@ -135,7 +139,10 @@ public class CollectionManager implements CollectionManagerImpl {
             return 0;
         }
         return (int) collection.stream()
-                .filter(m -> m.getOscarsCount() == null || m.getOscarsCount() < oscarsValue)
+                .filter(m -> {
+                    Integer cnt = m.getOscarsCount();
+                    return  cnt == null || cnt < oscarsValue;
+                })
                 .count();
     }
 

@@ -1,6 +1,5 @@
 package client;
 
-
 import common.IO.IOManager;
 import common.fileexceptions.FilePermissionException;
 import common.fileexceptions.InvalidFileNameException;
@@ -10,7 +9,7 @@ import java.io.FileNotFoundException;
 
 public class ClientFileManager {
 
-    private IOManager ioManager;
+    private final IOManager ioManager;
 
     public ClientFileManager(IOManager ioManager) {
         this.ioManager = ioManager;

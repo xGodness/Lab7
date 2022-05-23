@@ -21,8 +21,6 @@ public class Application {
     private CommandInvoker commandInvoker;
     private DBManager dbManager;
 
-    private boolean collectionWasLoaded = false;
-
     /*________________________________________________________________________________________________________________
                                                     Constructor
     ________________________________________________________________________________________________________________*/
@@ -47,7 +45,6 @@ public class Application {
         CollectionManager collectionManager = new CollectionManager(new ConcurrentSkipListSet(collection));
         collectionManager.setup(this);
         this.collectionManager = collectionManager;
-        collectionWasLoaded = true;
     }
 
     /*________________________________________________________________________________________________________________
@@ -82,8 +79,8 @@ public class Application {
      *
      * @param command Command to execute
      * @param args    Command arguments (necessary, can be null)
-     * @return Execution result
-     * @throws CollectionException Exception thrown during executing the command
+     * @return        Execution result
+     * @throws        CollectionException Exception thrown during command execution
      */
     public String executeCommand(CommandImpl command, Object[] args, String username) throws CollectionException {
         commandInvoker.setCommand(command, args, username);

@@ -26,10 +26,10 @@ public class AddIfMaxCommand extends Command {
     }
 
     @Override
-    public String execute(@NotNull CollectionManagerImpl moviesCollection, Object[] args, String username) throws CollectionException {
+    public String execute(@NotNull CollectionManagerImpl collectionManager, Object[] args, String username) throws CollectionException {
         try {
             Movie movie = (Movie) args[0];
-            return moviesCollection.addIfMax(movie, username) ? "New movie has been added" : "Specified movie has not been added";
+            return collectionManager.addIfMax(movie, username) ? "New movie has been added" : "Specified movie has not been added";
         } catch (DatabaseException e) {
             throw new CollectionException(e.getMessage());
         } catch (SQLException e) {

@@ -26,11 +26,11 @@ public class UpdateCommand extends Command {
     }
 
     @Override
-    public String execute(@NotNull CollectionManagerImpl moviesCollection, Object[] args, String username) throws CollectionException {
+    public String execute(@NotNull CollectionManagerImpl collectionManager, Object[] args, String username) throws CollectionException {
         try {
             Long id = Long.valueOf((String) args[0]);
             Movie movie = (Movie) args[1];
-            moviesCollection.updateMovie(id, movie, username);
+            collectionManager.updateMovie(id, movie, username);
             return "Movie with id " + id + " has been updated";
         } catch (DatabaseException e) {
             throw new CollectionException(e.getMessage());

@@ -21,12 +21,12 @@ public class InfoCommand extends Command {
     }
 
     @Override
-    public String execute(@NotNull CollectionManagerImpl moviesCollection, Object[] args, String username) throws CollectionException {
-        if (moviesCollection.isEmpty()) throw new CollectionException("Collection is empty");
+    public String execute(@NotNull CollectionManagerImpl collectionManager, Object[] args, String username) throws CollectionException {
+        if (collectionManager.isEmpty()) throw new CollectionException("Collection is empty");
         return
-                "Collection type     : " + moviesCollection.getCollection().getClass() + "\n" +
-                "Initialization date : " + moviesCollection.getInitDateTime() + "\n" +
-                "Collection size     : " + moviesCollection.getCollectionSize();
+                "Collection type     : " + collectionManager.getCollection().getClass() + "\n" +
+                "Initialization date : " + collectionManager.getInitDateTime() + "\n" +
+                "Collection size     : " + collectionManager.getCollectionSize();
     }
 
 }

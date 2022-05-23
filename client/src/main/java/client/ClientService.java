@@ -107,12 +107,12 @@ public class ClientService {
     }
 
     private static void selectPort() {
-        while (port == 0) {
+        while (true) {
             port = ioManager.getNextInteger("Specify port: ", false);
-            if (port < 0) {
-                ioManager.printlnErr("Incorrect input. Port must be positive integer");
-                port = 0;
+            if (port > -1 && port < 65535) {
+                break;
             }
+            ioManager.printlnErr("Incorrect input. Port must be integer from 0 to 65535");
         }
     }
 
@@ -136,7 +136,7 @@ public class ClientService {
 
     private static Response receiveResponse() throws IOException, ClassNotFoundException {
         Instant awaitTime = Instant.now();
-        ByteBuffer buffer = ByteBuffer.allocate(4096);
+        ByteBuffer buffer = ByteBuffer.allocate(65536);
         while (buffer.position() == 0 && Duration.between(awaitTime, Instant.now()).getSeconds() < 5) {
             datagramChannel.receive(buffer);
         }

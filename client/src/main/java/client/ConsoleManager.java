@@ -105,20 +105,20 @@ public class ConsoleManager {
      * Method that begins Console Manager iteration.
      */
     public Request execute(String username) {
-        if (ioManager.isScannerStackEmpty() && !scriptStackTrace.isEmpty()) {
+        String input = ioManager.getNextInput("Type command (type \"help\" for help): ").toLowerCase(Locale.ROOT);
+        if (!scriptStackTrace.isEmpty() && ioManager.isScannerStackEmpty()) {
             scriptStackTrace.clear();
         }
-        String input;
-        LinkedList<String> parsedInput = new LinkedList<>();
         String commandTag;
-        input = ioManager.getNextInput("Type command (type \"help\" for help): ").toLowerCase(Locale.ROOT);
-        for (String word : input.split("\\s+")) {
-            parsedInput.add(word.trim());
-        }
+        LinkedList<String> parsedInput = new LinkedList<>();
+        Arrays.stream(input.split("\\s+"))
+                .map(String::trim)
+                .forEach(parsedInput::add);
         if (parsedInput.size() == 0) {
             return null;
         }
         commandTag = parsedInput.pollFirst();
+
         switch (commandTag) {
             case ("help"):
                 descriptionsHashMap.values()
@@ -126,8 +126,10 @@ public class ConsoleManager {
                         .map(s -> s.split("\\.\\.\\."))
                         .forEach(ioManager::printlnInfoFormat);
                 return null;
+
             case ("exit"):
                 return new Request(RequestType.EXIT);
+
             case ("execute_script"):
                 if (parsedInput.size() == 0) {
                     ioManager.printlnErr("Too few arguments");
@@ -145,6 +147,8 @@ public class ConsoleManager {
                         return null;
                     }
                 }
+                break;
+
             default:
                 try {
                     Command command = CommandsFactory.getCommand(commandTag);
@@ -166,21 +170,21 @@ public class ConsoleManager {
                     ioManager.printlnErr(e.getMessage());
                     return null;
                 }
-
-
         }
+        return null;
     }
 
 
     /**
      * Method that executes scripts from file.
      *
-     * @param fileName Name of the file contains script to execute
+     * @param  fileName Name of the file contains script to execute
      * @throws FileException      Exception thrown if program could not access specified script file
      * @throws IOException        Exception thrown if lab6.lab6.client.lab6.IO manager had caught incorrect input
      * @throws RecursionException Exception thrown if recursion had been found
      */
     public void executeScript(String fileName) throws FileException, IOException, RecursionException {
+        System.out.println(scriptStackTrace);
         if (scriptStackTrace.contains(fileName)) {
             throw new RecursionException("Recursion has been found");
         }

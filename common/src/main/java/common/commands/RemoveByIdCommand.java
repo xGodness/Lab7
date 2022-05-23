@@ -26,13 +26,13 @@ public class RemoveByIdCommand extends Command {
     }
 
     @Override
-    public String execute(@NotNull CollectionManagerImpl moviesCollection, Object[] args, String username) throws CollectionException {
+    public String execute(@NotNull CollectionManagerImpl collectionManager, Object[] args, String username) throws CollectionException {
         try {
             long id = Long.parseLong((String) args[0]);
             if (id <= 0) {
                 throw new IdException("Incorrect input. Positive integer expected");
             }
-            moviesCollection.removeMovie(id, username);
+            collectionManager.removeMovie(id, username);
             return "Movie with id " + id + "  has been removed";
 
         } catch (DatabaseException e) {
