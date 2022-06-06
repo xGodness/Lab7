@@ -184,7 +184,6 @@ public class ConsoleManager {
      * @throws RecursionException Exception thrown if recursion had been found
      */
     public void executeScript(String fileName) throws FileException, IOException, RecursionException {
-        System.out.println(scriptStackTrace);
         if (scriptStackTrace.contains(fileName)) {
             throw new RecursionException("Recursion has been found");
         }

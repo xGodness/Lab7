@@ -7,8 +7,10 @@ import java.io.*;
 import java.net.*;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
+import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ServerService { // TODO: close socket after terminating
+public class ServerService {
     private static DatagramSocket socket = null;
     private static DatagramPacket packet = null;
     private static Application application;
@@ -24,17 +26,34 @@ public class ServerService { // TODO: close socket after terminating
     }
 
     private static void runServerMainLoop() { //TODO: logger?
-        boolean isRunning = true;
+        AtomicBoolean isRunning = new AtomicBoolean(true);
+
+        Thread serverConsole = new Thread(() -> {
+            Scanner consoleScanner = new Scanner(System.in);
+            while (true) {
+                if (consoleScanner.hasNext()) {
+                    try {
+                        String input = consoleScanner.nextLine();
+                        if (input.equalsIgnoreCase("exit")) {
+                            isRunning.set(false);
+                        }
+                    } catch (NoSuchElementException | IllegalArgumentException e) {
+                        System.exit(1337);
+                    }
+                }
+            }
+        });
 
         try {
             startServer();
+            serverConsole.start();
             application = new Application(dbManager);
             requestHandler = new RequestHandler(socket, application);
 
             application.loadCollection();
             ioManager.printlnStatus("Collection has been loaded");
 
-            while (isRunning) {
+            while (isRunning.get()) {
                 packet = receivePacket();
 
                 if (packet == null || packet.getPort() < 0) {
@@ -84,7 +103,7 @@ public class ServerService { // TODO: close socket after terminating
                     password = ioManager.getNextPassword();
                     break;
                 case 2:
-                    host = "localhost";
+                    host = "jdbc:postgresql://localhost:5432/postgres";
                     user = "postgres";
                     password = "gfhjkm";
                     break;
@@ -99,6 +118,18 @@ public class ServerService { // TODO: close socket after terminating
                 ioManager.printlnErr("Error while connecting database. Try again");
             }
         }
+
+        Thread terminationHook = new Thread(() -> {
+            socket.close();
+            try {
+                dbManager.close();
+                ioManager.printlnStatus("Connection closed");
+            } catch (SQLException e) {
+                ioManager.printlnStatus("Unable to close connection to the database");
+            }
+        });
+
+        Runtime.getRuntime().addShutdownHook(terminationHook);
 
     }
 
