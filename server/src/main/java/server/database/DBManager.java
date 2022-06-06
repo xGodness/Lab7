@@ -21,16 +21,13 @@ public class DBManager {
         if (host.equals("jdbc:postgresql://pg:5432/studs")) {
             connection = DriverManager.getConnection(host, username, password);
         } else {
-            System.out.println("DEBUG 1");
             try {
                 Class.forName("java.sql.DriverManager");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
                 System.exit(-1);
             }
-            System.out.println("DEBUG 2");
             connection = DriverManager.getConnection(host, username, password);
-            System.out.println("DEBUG 3");
 //            PGSimpleDataSource pgDataSource = new PGSimpleDataSource();
 //            pgDataSource.setServerNames(new String[] {host});
 //            pgDataSource.setUser(username);

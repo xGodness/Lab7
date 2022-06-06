@@ -16,7 +16,6 @@ public class StatementInvoker {
     private Connection connection;
     private PreparedStatement checkUserStatement;
     private PreparedStatement registerUserStatement;
-    private static final String pepper = "E#;Ax.W="; // TODO: move to client
 
     public StatementInvoker(@NotNull Connection connection) throws SQLException {
         this.connection = connection;
@@ -70,7 +69,7 @@ public class StatementInvoker {
         String salt = SaltGenerator.generateSalt();
         String passwordHash;
         try {
-            passwordHash = Encryptor.encrypt(pepper + password + salt);
+            passwordHash = Encryptor.encrypt(password + salt);
         } catch (NoSuchAlgorithmException e) {
             throw new DatabaseException("Error during encrypting process");
         }
@@ -88,7 +87,7 @@ public class StatementInvoker {
             String passwordHash = sqlResult.getString("password_hash");
             String userSalt = sqlResult.getString("salt");
             try {
-                String providedPasswordHash = Encryptor.encrypt(pepper + password + userSalt);
+                String providedPasswordHash = Encryptor.encrypt(password + userSalt);
                 passwordIsCorrect = providedPasswordHash.equals(passwordHash);
 
             } catch (NoSuchAlgorithmException e) {

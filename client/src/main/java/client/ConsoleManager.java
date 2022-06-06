@@ -22,8 +22,9 @@ import java.util.stream.Collectors;
  */
 public class ConsoleManager {
 
-    /* Contains all lab6.lab6.client.lab6.commands' description */
+    /* Contains commands' description */
     private final static LinkedHashMap<String, String> descriptionsHashMap;
+    private static final String pepper = "E#;Ax.W=";
 
     static {
         /* Registering all available lab6.lab6.client.lab6.commands */
@@ -94,7 +95,7 @@ public class ConsoleManager {
         }
         String username = ioManager.getNextInput("Username: ", false);
         String password = ioManager.getNextPassword();
-        Session session = new Session(username, password);
+        Session session = new Session(username, pepper + password);
         if (opCode == 1) {
             return new Request(RequestType.LOGIN, session);
         }
@@ -180,7 +181,7 @@ public class ConsoleManager {
      *
      * @param  fileName Name of the file contains script to execute
      * @throws FileException      Exception thrown if program could not access specified script file
-     * @throws IOException        Exception thrown if lab6.lab6.client.lab6.IO manager had caught incorrect input
+     * @throws IOException        Exception thrown if IO manager had caught incorrect input
      * @throws RecursionException Exception thrown if recursion had been found
      */
     public void executeScript(String fileName) throws FileException, IOException, RecursionException {

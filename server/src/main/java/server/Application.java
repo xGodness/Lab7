@@ -41,15 +41,10 @@ public class Application {
      *
      */
     public void loadCollection() throws SQLException {
-        System.out.println("DEBUG 4");
         LinkedList<Movie> collection = dbManager.getCollection();
-        System.out.println("DEBUG 5");
         CollectionManager collectionManager = new CollectionManager(new ConcurrentSkipListSet(collection));
-        System.out.println("DEBUG 6");
         collectionManager.setup(this);
-        System.out.println("DEBUG 7");
         this.collectionManager = collectionManager;
-        System.out.println("DEBUG 8");
     }
 
     /*________________________________________________________________________________________________________________
